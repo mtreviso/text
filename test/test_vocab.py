@@ -326,3 +326,10 @@ class TestVocab(TorchtextTestCase):
         pickle.dump(v, open(pickle_path, "wb"))
         v_loaded = pickle.load(open(pickle_path, "rb"))
         assert v == v_loaded
+
+    def test_freq_size(self):
+        specials = ['<unk>', '<pad>', '<bos>']
+        c = Counter({'hello': 4, 'world': 3, 'ᑌᑎIᑕOᗪᕮ_Tᕮ᙭T': 5, 'freq_too_low': 2})
+        v = vocab.Vocab(c, min_freq=3, specials=specials)
+        # specials are not added to freqs
+        self.assertEqual(len(v.stoi), len(v.freqs) + len(specials))

@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from collections import defaultdict
+from collections import defaultdict, Counter
 from functools import partial
 import logging
 import os
@@ -52,7 +52,7 @@ class Vocab(object):
                 If it is False, they are added into the vocabulary at last.
                 Default: True.
         """
-        self.freqs = counter
+        self.freqs = Counter()
         counter = counter.copy()
         min_freq = max(min_freq, 1)
 
@@ -75,6 +75,7 @@ class Vocab(object):
             if freq < min_freq or len(self.itos) == max_size:
                 break
             self.itos.append(word)
+            self.freqs[word] = freq
 
         if not specials_first:
             self.itos.extend(list(specials))
