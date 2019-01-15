@@ -27,9 +27,9 @@ class BABI20Field(Field):
             for ex in minibatch:
                 # sentences are indexed in reverse order and truncated to memory_size
                 nex = ex[::-1][:self.memory_size]
-                padded.append(
-                    super(BABI20Field, self).pad(nex) +
-                    [[self.pad_token] * self.fix_length] * (self.memory_size - len(nex)))
+                n = (self.memory_size - len(nex))
+                pad_tokens = [[self.pad_token] * self.fix_length] * n
+                padded.append(super(BABI20Field, self).pad(nex) + pad_tokens)
             self.fix_length = None
             return padded
         else:
@@ -82,7 +82,7 @@ class BABI20(Dataset):
                     substory = [story[int(i) - 1] for i in supporting.split()]
                 else:
                     substory = [x for x in story if x]
-                data.append((substory, query[:-1], answer))    # remove '?'
+                data.append((substory, query[:-1], answer))  # remove '?'
                 story.append("")
         return data
 
@@ -97,26 +97,26 @@ class BABI20(Dataset):
         if path is None:
             path = cls.download(root)
         if train is None:
-            if joint:    # put all tasks together for joint learning
+            if joint:  # put all tasks together for joint learning
                 train = 'all_train.txt'
                 if not os.path.isfile(os.path.join(path, train)):
                     with open(os.path.join(path, train), 'w') as tf:
                         for task in range(1, 21):
                             with open(
-                                    os.path.join(path,
-                                                 'qa' + str(task) + '_train.txt')) as f:
+                                os.path.join(path,
+                                             'qa' + str(task) + '_train.txt')) as f:
                                 tf.write(f.read())
             else:
                 train = 'qa' + str(task) + '_train.txt'
         if validation is None:
-            if joint:    # put all tasks together for joint learning
+            if joint:  # put all tasks together for joint learning
                 validation = 'all_valid.txt'
                 if not os.path.isfile(os.path.join(path, validation)):
                     with open(os.path.join(path, validation), 'w') as tf:
                         for task in range(1, 21):
                             with open(
-                                    os.path.join(path,
-                                                 'qa' + str(task) + '_valid.txt')) as f:
+                                os.path.join(path,
+                                             'qa' + str(task) + '_valid.txt')) as f:
                                 tf.write(f.read())
             else:
                 validation = 'qa' + str(task) + '_valid.txt'

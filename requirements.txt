@@ -11,7 +11,7 @@ six
 nltk
 spacy
 sacremoses
-git+git://github.com/jekbradbury/revtok.git
+git+git://github.com/jekbradbury/revtok.git#egg=revtok
 
 # Documentation
 Sphinx
